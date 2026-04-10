@@ -22,4 +22,5 @@ func SetupRoutes(app *fiber.App, apiContainer *bootstrap.APIContainer) {
 	v1 := api.Group("/v1")
 
 	RegisterHealthRoutes(v1)
+	RegisterAuthRoutes(v1, apiContainer.AuthController)
 }

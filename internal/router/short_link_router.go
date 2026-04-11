@@ -11,13 +11,15 @@ import (
 func RegisterShortLinkRoutes(router fiber.Router, controller *controller.ShortLinkController) {
 	route := router.Group("/short-link")
 
-	route.Get("/", controller.GetAllShortLinks)
+	route.Get("/", middleware.JWTMiddleware, controller.GetAllShortLinks)
 	route.Post("/random",
 		middleware.Validate[request.ShortLinkRequest],
+		middleware.JWTMiddleware,
 		controller.CreateRandomShortLink,
 	)
 	route.Post("/custom",
 		middleware.Validate[request.ShortLinkRequest],
+		middleware.JWTMiddleware,
 		controller.CreateCustomShortLink,
 	)
 }

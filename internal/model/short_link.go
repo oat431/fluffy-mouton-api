@@ -14,5 +14,5 @@ type ShortLink struct {
 
 	TargetURL string   `db:"target_url" json:"target_url"`
 	ShortURL  string   `db:"short_url" json:"short_url"`
-	LinkType  LinkType `db:"type" json:"type"`
+	Type      LinkType `db:"type" json:"type"`
 }

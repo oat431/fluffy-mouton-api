@@ -11,30 +11,32 @@ import (
 )
 
 type APIContainer struct {
-	AuthController *controller.AuthController
+	AuthController      *controller.AuthController
+	ShortLinkController *controller.ShortLinkController
+	RedirectController  *controller.RedirectController
 }
 
 func NewAPIContainer(db *sqlx.DB) *APIContainer {
-	log.Info("Registering Auth Repository")
+	log.Info("Registering Application Repository")
 	authRepository := repository.NewAuthRepository(db)
-
-	log.Info("Registering Refresh Token Repository")
 	refreshTokenRepository := repository.NewRefreshTokenRepository(db)
-
-	log.Info("Registering Email Verify Token Repository")
 	emailVerifyTokenRepository := repository.NewEmailVerifyTokenRepository(db)
+	shortLinkRepository := repository.NewShortLinkRepository(db)
 
-	log.Info("Registering SMTP Service")
+	log.Info("Registering Application Service")
 	smtpService := service.NewSMTPService(config.GetEmailConfig())
-
-	log.Info("Registering Auth Service")
 	authService := service.NewAuthService(authRepository, refreshTokenRepository, emailVerifyTokenRepository, smtpService)
+	shortLinkService := service.NewShortLinkService(shortLinkRepository)
 
-	log.Info("Registering Auth Controller")
+	log.Info("Registering Application Controller")
 	authController := controller.NewAuthController(authService)
+	shortLinkController := controller.NewShortLinkController(shortLinkService)
+	redirectController := controller.NewRedirectController(shortLinkService)
 
 	log.Info("Registered All API")
 	return &APIContainer{
-		AuthController: authController,
+		AuthController:      authController,
+		ShortLinkController: shortLinkController,
+		RedirectController:  redirectController,
 	}
 }

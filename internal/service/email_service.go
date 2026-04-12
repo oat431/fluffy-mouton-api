@@ -48,8 +48,8 @@ func (s *SMTPService) SendMail(to string) error {
 func (s *SMTPService) SendVerificationEmail(to, token string) error {
 	subject := "Subject: Fluffy Mouton Account Verification\n"
 	body := fmt.Sprintf(`
-		If you are receiving this email, it means that your account has been successfully created. \n
-		Please verify your email address by clicking the link here:http://localhost:3000/verify-email?token=%s\n
+		If you are receiving this email, it means that your account has been successfully created.
+		Please verify your email address by clicking the link here:http://localhost:3000/verify-email?token=%s
 		Thank you for joining Fluffy Mouton!
 	`, token)
 

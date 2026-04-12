@@ -23,7 +23,7 @@ func NewEmailVerifyTokenRepository(db *sqlx.DB) EmailVerifyTokenRepository {
 }
 
 func (r *emailVerifyTokenRepository) Save(ctx context.Context, token model.EmailVerifyToken) error {
-	query := `INSERT INTO tb_email_verify_tokens (
+	query := `INSERT INTO tb_verify_tokens (
 				id, created_at, updated_at, deleted_at, auth_id, token, expires_at
 			) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 	_, err := r.db.ExecContext(ctx, query,
@@ -40,7 +40,7 @@ func (r *emailVerifyTokenRepository) Save(ctx context.Context, token model.Email
 
 func (r *emailVerifyTokenRepository) FindByToken(ctx context.Context, token string) (*model.EmailVerifyToken, error) {
 	query := `SELECT id, created_at, updated_at, deleted_at, auth_id, token, expires_at
-			  FROM tb_email_verify_tokens
+			  FROM tb_verify_tokens
 			  WHERE token = $1 AND deleted_at IS NULL`
 	var result model.EmailVerifyToken
 	err := r.db.GetContext(ctx, &result, query, token)
@@ -51,7 +51,7 @@ func (r *emailVerifyTokenRepository) FindByToken(ctx context.Context, token stri
 }
 
 func (r *emailVerifyTokenRepository) DeleteByAuthID(ctx context.Context, authID uuid.UUID) error {
-	query := `DELETE FROM tb_email_verify_tokens WHERE auth_id = $1`
+	query := `DELETE FROM tb_verify_tokens WHERE auth_id = $1`
 	_, err := r.db.ExecContext(ctx, query, authID)
 	return err
 }

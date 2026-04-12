@@ -23,4 +23,7 @@ func SetupRoutes(app *fiber.App, apiContainer *bootstrap.APIContainer) {
 
 	RegisterHealthRoutes(v1)
 	RegisterAuthRoutes(v1, apiContainer.AuthController)
+	RegisterShortLinkRoutes(v1, apiContainer.ShortLinkController)
+	RegisterRedirectRoutes(v1, apiContainer.RedirectController)
+
 }

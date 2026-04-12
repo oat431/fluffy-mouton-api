@@ -7,6 +7,7 @@ import (
 	"oat431/fluffy-mouton/pkg/common"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/google/uuid"
 )
 
 type ShortLinkController struct {
@@ -18,7 +19,8 @@ func NewShortLinkController(service service.ShortLinkService) *ShortLinkControll
 }
 
 func (s *ShortLinkController) GetAllShortLinks(c fiber.Ctx) error {
-	shortLinkDTOs, err := s.service.GetAllLinks(c.Context())
+	ownBy := c.Locals("auth_id").(uuid.UUID)
+	shortLinkDTOs, err := s.service.GetAllLinks(c.Context(), ownBy)
 	var res = common.ResponseDTO[[]response.ShortLinkDTO]{}
 	if err != nil {
 		res.Data = nil
@@ -39,8 +41,9 @@ func (s *ShortLinkController) GetAllShortLinks(c fiber.Ctx) error {
 
 func (s *ShortLinkController) CreateRandomShortLink(c fiber.Ctx) error {
 	req := c.Locals("payload").(*request.ShortLinkRequest)
+	ownBy := c.Locals("auth_id").(uuid.UUID)
 
-	shortLinkDTO, err := s.service.CreateRandomShortLink(c.Context(), req.Url)
+	shortLinkDTO, err := s.service.CreateRandomShortLink(c.Context(), req.Url, ownBy)
 	var res = common.ResponseDTO[response.ShortLinkDTO]{}
 	if err != nil {
 		res.Data = nil
@@ -61,7 +64,9 @@ func (s *ShortLinkController) CreateRandomShortLink(c fiber.Ctx) error {
 
 func (s *ShortLinkController) CreateCustomShortLink(c fiber.Ctx) error {
 	req := c.Locals("payload").(*request.ShortLinkRequest)
-	shortLinkDTO, err := s.service.CreateCustomShortLink(c.Context(), req.Url, req.CustomName)
+	ownBy := c.Locals("auth_id").(uuid.UUID)
+
+	shortLinkDTO, err := s.service.CreateCustomShortLink(c.Context(), req.Url, req.CustomName, ownBy)
 	var res = common.ResponseDTO[response.ShortLinkDTO]{}
 	if err != nil {
 		res.Data = nil

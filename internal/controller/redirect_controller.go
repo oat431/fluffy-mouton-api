@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"errors"
+
 	"oat431/fluffy-mouton/internal/payload/response"
 	"oat431/fluffy-mouton/internal/service"
 	"oat431/fluffy-mouton/pkg/common"
@@ -13,8 +15,11 @@ type RedirectController struct {
 	service.ShortLinkService
 }
 
-func NewRedirectController(shortLinkService service.ShortLinkService) *RedirectController {
-	return &RedirectController{ShortLinkService: shortLinkService}
+func NewRedirectController(shortLinkService service.ShortLinkService) (*RedirectController, error) {
+	if shortLinkService == nil {
+		return nil, errors.New("redirect controller: nil service")
+	}
+	return &RedirectController{ShortLinkService: shortLinkService}, nil
 }
 
 func (s *RedirectController) ShortLinkRedirect(c fiber.Ctx) error {

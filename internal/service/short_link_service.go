@@ -2,13 +2,15 @@ package service
 
 import (
 	"context"
-	"oat431/fluffy-mouton/internal/payload/response"
-	"oat431/fluffy-mouton/internal/repository"
-	"oat431/fluffy-mouton/pkg/utils"
+	"errors"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
+
+	"oat431/fluffy-mouton/internal/payload/response"
+	"oat431/fluffy-mouton/internal/repository"
+	"oat431/fluffy-mouton/pkg/utils"
 )
 
 type ShortLinkService interface {
@@ -22,8 +24,11 @@ type shortLinkService struct {
 	repo repository.ShortLinkRepository
 }
 
-func NewShortLinkService(repo repository.ShortLinkRepository) ShortLinkService {
-	return &shortLinkService{repo: repo}
+func NewShortLinkService(repo repository.ShortLinkRepository) (ShortLinkService, error) {
+	if repo == nil {
+		return nil, errors.New("short link service: nil repository")
+	}
+	return &shortLinkService{repo: repo}, nil
 }
 
 func (s shortLinkService) GetAllLinks(ctx context.Context, ownBy uuid.UUID) ([]response.ShortLinkDTO, error) {

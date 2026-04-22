@@ -2,12 +2,13 @@ package repository
 
 import (
 	"context"
-	"oat431/fluffy-mouton/internal/model"
-	"oat431/fluffy-mouton/pkg/utils"
+	"time"
 
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+
+	"oat431/fluffy-mouton/internal/model"
 )
 
 type ShortLinkRepository interface {
@@ -65,16 +66,16 @@ func (s shortLinkRepository) GetLinkByShortCode(ctx context.Context, code string
 
 func (s shortLinkRepository) CreateShortLink(ctx context.Context, url string, shortUrl string, linkType string, ownBy uuid.UUID) (*model.ShortLink, error) {
 	query := "INSERT INTO tb_short_links (id,target_url, short_url, type, created_at, own_by) VALUES ($1, $2, $3,$4,$5,$6) RETURNING id, target_url, short_url, type, created_at, own_by"
-	uuid := utils.GenerateUUID()
+	id := uuid.New()
 	var sl model.ShortLink
 	err := s.db.QueryRowContext(
 		ctx,
 		query,
-		uuid,
+		id,
 		url,
 		shortUrl,
 		linkType,
-		utils.GetCurrentTime(),
+		time.Now(),
 		ownBy,
 	).Scan(&sl.ID, &sl.TargetURL, &sl.ShortURL, &sl.Type, &sl.CreatedAt, &sl.OwnBy)
 	if err != nil {

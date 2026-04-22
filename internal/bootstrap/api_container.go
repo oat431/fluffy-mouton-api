@@ -16,7 +16,7 @@ type APIContainer struct {
 	RedirectController  *controller.RedirectController
 }
 
-func NewAPIContainer(db *sqlx.DB) *APIContainer {
+func NewAPIContainer(db *sqlx.DB) (*APIContainer, error) {
 	log.Info("Registering Application Repository")
 	authRepository := repository.NewAuthRepository(db)
 	refreshTokenRepository := repository.NewRefreshTokenRepository(db)
@@ -25,18 +25,33 @@ func NewAPIContainer(db *sqlx.DB) *APIContainer {
 
 	log.Info("Registering Application Service")
 	smtpService := service.NewSMTPService(config.GetEmailConfig())
-	authService := service.NewAuthService(authRepository, refreshTokenRepository, emailVerifyTokenRepository, smtpService)
-	shortLinkService := service.NewShortLinkService(shortLinkRepository)
+	authService, err := service.NewAuthService(authRepository, refreshTokenRepository, emailVerifyTokenRepository, smtpService)
+	if err != nil {
+		return nil, err
+	}
+	shortLinkService, err := service.NewShortLinkService(shortLinkRepository)
+	if err != nil {
+		return nil, err
+	}
 
 	log.Info("Registering Application Controller")
-	authController := controller.NewAuthController(authService)
-	shortLinkController := controller.NewShortLinkController(shortLinkService)
-	redirectController := controller.NewRedirectController(shortLinkService)
+	authController, err := controller.NewAuthController(authService)
+	if err != nil {
+		return nil, err
+	}
+	shortLinkController, err := controller.NewShortLinkController(shortLinkService)
+	if err != nil {
+		return nil, err
+	}
+	redirectController, err := controller.NewRedirectController(shortLinkService)
+	if err != nil {
+		return nil, err
+	}
 
 	log.Info("Registered All API")
 	return &APIContainer{
 		AuthController:      authController,
 		ShortLinkController: shortLinkController,
 		RedirectController:  redirectController,
-	}
+	}, nil
 }

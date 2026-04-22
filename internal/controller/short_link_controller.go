@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"errors"
+
 	"oat431/fluffy-mouton/internal/payload/request"
 	"oat431/fluffy-mouton/internal/payload/response"
 	"oat431/fluffy-mouton/internal/service"
@@ -14,8 +16,11 @@ type ShortLinkController struct {
 	service service.ShortLinkService
 }
 
-func NewShortLinkController(service service.ShortLinkService) *ShortLinkController {
-	return &ShortLinkController{service: service}
+func NewShortLinkController(service service.ShortLinkService) (*ShortLinkController, error) {
+	if service == nil {
+		return nil, errors.New("short link controller: nil service")
+	}
+	return &ShortLinkController{service: service}, nil
 }
 
 func (s *ShortLinkController) GetAllShortLinks(c fiber.Ctx) error {

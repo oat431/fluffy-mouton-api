@@ -12,3 +12,5 @@ go.work
 .env
 .env.dev
 .env.production
+
+.agents

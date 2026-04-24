@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "api-documentation-generator": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "3900be4c9f563af4b0f9450570f67db31c13307c0226c9395bc2e2fdf909b1ce"
+    },
     "git-commit": {
       "source": "eduardo-sl/go-agent-skills",
       "sourceType": "github",

@@ -20,6 +20,8 @@
   - [Short Link - List All](#get-short-link)
   - [Short Link - Create Random](#post-short-linkrandom)
   - [Short Link - Create Custom](#post-short-linkcustom)
+  - [Short Link - Update](#put-short-linkid)
+  - [Short Link - Delete](#delete-short-linkid)
   - [Redirect](#get-linktypecode)
 - [Error Codes](#error-codes)
 - [CORS Configuration](#cors-configuration)
@@ -321,11 +323,13 @@ Get all short links owned by the authenticated user.
 {
   "data": [
     {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
       "short_link": "abc123",
       "original_link": "https://example.com/very-long-url",
       "link_type": "RANDOM"
     },
     {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
       "short_link": "my-link",
       "original_link": "https://example.com/another-url",
       "link_type": "CUSTOM"
@@ -379,6 +383,7 @@ Create a new short link with a randomly generated code.
 ```json
 {
   "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
     "short_link": "x7kQ9m",
     "original_link": "https://example.com/my-very-long-url-that-needs-shortening",
     "link_type": "RANDOM"
@@ -432,6 +437,7 @@ Create a new short link with a user-defined custom code.
 ```json
 {
   "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
     "short_link": "mypage",
     "original_link": "https://example.com/my-page",
     "link_type": "CUSTOM"
@@ -451,6 +457,106 @@ Create a new short link with a user-defined custom code.
     "HttpCode": 409,
     "ErrorCode": "SHORT_LINK_ALREADY_EXISTS",
     "Message": "Custom short link already exists"
+  }
+}
+```
+
+---
+
+### `PUT /short-link/:id`
+
+Update the target URL of an existing short link.
+
+| Property       | Value              |
+| -------------- | ------------------ |
+| Authentication | **Required** (JWT) |
+| Content-Type   | `application/json` |
+
+**Path Parameters:**
+
+| Parameter | Type     | Required | Description           |
+| --------- | -------- | -------- | --------------------- |
+| `id`      | `string` | Yes      | Short link UUID       |
+
+**Request Body:**
+
+| Field | Type     | Required | Validation        |
+| ----- | -------- | -------- | ----------------- |
+| `url` | `string` | Yes      | Must be valid URL |
+
+```json
+{
+  "url": "https://example.com/updated-url"
+}
+```
+
+**Success Response:** `200 OK`
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "short_link": "mypage",
+    "original_link": "https://example.com/updated-url",
+    "link_type": "CUSTOM"
+  },
+  "status": "SUCCESS",
+  "error": null
+}
+```
+
+**Error Response:** `404 Not Found`
+
+```json
+{
+  "data": null,
+  "status": "ERROR",
+  "error": {
+    "HttpCode": 404,
+    "ErrorCode": "SHORT_LINK_NOT_FOUND",
+    "Message": "Short link not found or access denied"
+  }
+}
+```
+
+---
+
+### `DELETE /short-link/:id`
+
+Delete a short link permanently.
+
+| Property       | Value              |
+| -------------- | ------------------ |
+| Authentication | **Required** (JWT) |
+
+**Path Parameters:**
+
+| Parameter | Type     | Required | Description           |
+| --------- | -------- | -------- | --------------------- |
+| `id`      | `string` | Yes      | Short link UUID       |
+
+**Example:** `DELETE /api/v1/short-link/550e8400-e29b-41d4-a716-446655440000`
+
+**Success Response:** `200 OK`
+
+```json
+{
+  "data": null,
+  "status": "SUCCESS",
+  "error": null
+}
+```
+
+**Error Response:** `404 Not Found`
+
+```json
+{
+  "data": null,
+  "status": "ERROR",
+  "error": {
+    "HttpCode": 404,
+    "ErrorCode": "SHORT_LINK_NOT_FOUND",
+    "Message": "Short link not found or access denied"
   }
 }
 ```
@@ -492,6 +598,53 @@ Redirect to the original URL using a short link code. This endpoint is registere
 
 ---
 
+## Getting Started
+
+### 1. Register a New User
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "email": "john@example.com",
+    "password": "SecurePassword123"
+  }'
+```
+
+### 2. Login
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "john_doe",
+    "password": "SecurePassword123"
+  }'
+```
+
+Response includes `access_token` — use this for authenticated requests.
+
+### 3. Create a Short Link
+
+```bash
+curl -X POST http://localhost:8080/api/v1/short-link/random \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "url": "https://example.com/my-very-long-url"
+  }'
+```
+
+### 4. Access Your Short Link
+
+```bash
+curl -L http://localhost:8080/api/v1/r/x7kQ9m
+# This will redirect to https://example.com/my-very-long-url
+```
+
+---
+
 ## Error Codes
 
 | Error Code                 | HTTP Status | Endpoint        | Description                         |
@@ -506,7 +659,7 @@ Redirect to the original URL using a short link code. This endpoint is registere
 | `UNAUTHORIZED`             | 401         | Protected endpoints    | JWT authentication failed      |
 | `INTERNAL_SERVER_ERROR`    | 500         | Short link endpoints   | Server error                   |
 | `SHORT_LINK_ALREADY_EXISTS`| 409         | POST /short-link/custom| Custom code already taken      |
-| `SHORT_LINK_NOT_FOUND`     | 404         | GET /:linkType/:code   | Short link does not exist      |
+| `SHORT_LINK_NOT_FOUND`     | 404         | PUT/DELETE /short-link/:id, GET /:linkType/:code | Short link does not exist or access denied |
 
 ---
 
@@ -520,3 +673,138 @@ Redirect to the original URL using a short link code. This endpoint is registere
 | Exposed Headers    | `Content-Length`                                  |
 | Allow Credentials  | `true`                                           |
 | Max Age            | 12 hours (43200 seconds)                         |
+
+---
+
+## Code Examples
+
+### JavaScript (Node.js / Fetch)
+
+```javascript
+// Register
+const registerResponse = await fetch('http://localhost:8080/api/v1/auth/register', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    username: 'john_doe',
+    email: 'john@example.com',
+    password: 'SecurePassword123'
+  })
+});
+const registerData = await registerResponse.json();
+
+// Login
+const loginResponse = await fetch('http://localhost:8080/api/v1/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    username: 'john_doe',
+    password: 'SecurePassword123'
+  })
+});
+const loginData = await loginResponse.json();
+const token = loginData.data.access_token;
+
+// Create short link
+const linkResponse = await fetch('http://localhost:8080/api/v1/short-link/random', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+  body: JSON.stringify({
+    url: 'https://example.com/my-long-url'
+  })
+});
+const linkData = await linkResponse.json();
+console.log(`Short link: http://localhost:8080/api/v1/r/${linkData.data.short_link}`);
+```
+
+### Python (Requests)
+
+```python
+import requests
+
+BASE_URL = 'http://localhost:8080/api/v1'
+
+# Register
+register_response = requests.post(
+    f'{BASE_URL}/auth/register',
+    json={
+        'username': 'john_doe',
+        'email': 'john@example.com',
+        'password': 'SecurePassword123'
+    }
+)
+print(register_response.json())
+
+# Login
+login_response = requests.post(
+    f'{BASE_URL}/auth/login',
+    json={
+        'username': 'john_doe',
+        'password': 'SecurePassword123'
+    }
+)
+login_data = login_response.json()
+token = login_data['data']['access_token']
+
+# Create short link
+link_response = requests.post(
+    f'{BASE_URL}/short-link/random',
+    headers={'Authorization': f'Bearer {token}'},
+    json={'url': 'https://example.com/my-long-url'}
+)
+link_data = link_response.json()
+print(f"Short link: {BASE_URL}/r/{link_data['data']['short_link']}")
+
+# Update short link
+update_response = requests.put(
+    f'{BASE_URL}/short-link/{link_data["data"]["id"]}',
+    headers={'Authorization': f'Bearer {token}'},
+    json={'url': 'https://example.com/updated-url'}
+)
+print(update_response.json())
+
+# Delete short link
+delete_response = requests.delete(
+    f'{BASE_URL}/short-link/{link_data["data"]["id"]}',
+    headers={'Authorization': f'Bearer {token}'}
+)
+print(delete_response.json())
+```
+
+### cURL Examples
+
+**Create Custom Short Link:**
+```bash
+curl -X POST http://localhost:8080/api/v1/short-link/custom \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "url": "https://example.com/page",
+    "custom_name": "mypage"
+  }'
+```
+
+**List All Short Links:**
+```bash
+curl -X GET http://localhost:8080/api/v1/short-link/ \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+**Update Short Link:**
+```bash
+curl -X PUT http://localhost:8080/api/v1/short-link/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -d '{
+    "url": "https://example.com/new-url"
+  }'
+```
+
+**Delete Short Link:**
+```bash
+curl -X DELETE http://localhost:8080/api/v1/short-link/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```

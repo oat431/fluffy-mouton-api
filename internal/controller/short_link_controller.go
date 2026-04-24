@@ -89,3 +89,48 @@ func (s *ShortLinkController) CreateCustomShortLink(c fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(res)
 }
+
+func (s *ShortLinkController) UpdateShortLink(c fiber.Ctx) error {
+	id := c.Params("id")
+	req := c.Locals("payload").(*request.UpdateShortLinkRequest)
+	ownBy := c.Locals("auth_id").(uuid.UUID)
+
+	shortLinkDTO, err := s.service.UpdateShortLink(c.Context(), id, req.Url, ownBy)
+	var res = common.ResponseDTO[response.ShortLinkDTO]{}
+	if err != nil {
+		res.Data = nil
+		res.Status = common.ERROR
+		res.Error = &common.ResponseDTOError{
+			HttpCode:  fiber.StatusNotFound,
+			ErrorCode: "SHORT_LINK_NOT_FOUND",
+			Message:   "Short link not found or access denied",
+		}
+		return c.Status(fiber.StatusNotFound).JSON(res)
+	}
+	res.Data = shortLinkDTO
+	res.Status = common.SUCCESS
+	res.Error = nil
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}
+
+func (s *ShortLinkController) DeleteShortLink(c fiber.Ctx) error {
+	id := c.Params("id")
+	ownBy := c.Locals("auth_id").(uuid.UUID)
+
+	var res = common.ResponseDTO[any]{}
+	if err := s.service.DeleteShortLink(c.Context(), id, ownBy); err != nil {
+		res.Data = nil
+		res.Status = common.ERROR
+		res.Error = &common.ResponseDTOError{
+			HttpCode:  fiber.StatusNotFound,
+			ErrorCode: "SHORT_LINK_NOT_FOUND",
+			Message:   "Short link not found or access denied",
+		}
+		return c.Status(fiber.StatusNotFound).JSON(res)
+	}
+	res.Status = common.SUCCESS
+	res.Error = nil
+
+	return c.Status(fiber.StatusOK).JSON(res)
+}

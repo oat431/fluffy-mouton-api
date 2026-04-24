@@ -18,6 +18,8 @@ type ShortLinkService interface {
 	GetLinkByCode(ctx context.Context, code string, linkType string) (*response.ShortLinkDTO, error)
 	CreateRandomShortLink(ctx context.Context, originalURL string, ownBy uuid.UUID) (*response.ShortLinkDTO, error)
 	CreateCustomShortLink(ctx context.Context, originalURL string, customCode string, ownBy uuid.UUID) (*response.ShortLinkDTO, error)
+	UpdateShortLink(ctx context.Context, id string, url string, ownBy uuid.UUID) (*response.ShortLinkDTO, error)
+	DeleteShortLink(ctx context.Context, id string, ownBy uuid.UUID) error
 }
 
 type shortLinkService struct {
@@ -40,6 +42,7 @@ func (s shortLinkService) GetAllLinks(ctx context.Context, ownBy uuid.UUID) ([]r
 	var shortLinkDTOs []response.ShortLinkDTO
 	for _, sl := range shortLinks {
 		shortLinkDTO := response.ShortLinkDTO{
+			ID:           sl.ID.String(),
 			ShortLink:    sl.ShortURL,
 			OriginalLink: sl.TargetURL,
 			LinkType:     string(sl.Type),
@@ -57,6 +60,7 @@ func (s shortLinkService) GetLinkByCode(ctx context.Context, code string, linkTy
 	}
 
 	shortLinkDTO := &response.ShortLinkDTO{
+		ID:           shortLink.ID.String(),
 		ShortLink:    shortLink.ShortURL,
 		OriginalLink: shortLink.TargetURL,
 		LinkType:     string(shortLink.Type),
@@ -83,6 +87,7 @@ func (s shortLinkService) CreateRandomShortLink(ctx context.Context, originalURL
 	}
 
 	shortLinkDTO := &response.ShortLinkDTO{
+		ID:           shortLink.ID.String(),
 		ShortLink:    shortLink.ShortURL,
 		OriginalLink: shortLink.TargetURL,
 		LinkType:     string(shortLink.Type),
@@ -103,9 +108,28 @@ func (s shortLinkService) CreateCustomShortLink(ctx context.Context, originalURL
 	}
 
 	shortLinkDTO := &response.ShortLinkDTO{
+		ID:           shortLink.ID.String(),
 		ShortLink:    shortLink.ShortURL,
 		OriginalLink: shortLink.TargetURL,
 		LinkType:     string(shortLink.Type),
 	}
 	return shortLinkDTO, nil
+}
+
+func (s shortLinkService) UpdateShortLink(ctx context.Context, id string, url string, ownBy uuid.UUID) (*response.ShortLinkDTO, error) {
+	shortLink, err := s.repo.UpdateShortLinkURL(ctx, id, url, ownBy)
+	if err != nil {
+		return nil, err
+	}
+	shortLinkDTO := &response.ShortLinkDTO{
+		ID:           shortLink.ID.String(),
+		ShortLink:    shortLink.ShortURL,
+		OriginalLink: shortLink.TargetURL,
+		LinkType:     string(shortLink.Type),
+	}
+	return shortLinkDTO, nil
+}
+
+func (s shortLinkService) DeleteShortLink(ctx context.Context, id string, ownBy uuid.UUID) error {
+	return s.repo.DeleteShortLink(ctx, id, ownBy)
 }

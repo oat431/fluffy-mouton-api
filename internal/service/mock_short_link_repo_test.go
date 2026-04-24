@@ -15,6 +15,8 @@ type mockShortLinkRepo struct {
 	getLinkByShortCodeFunc func(ctx context.Context, code string, linkType string) (*model.ShortLink, error)
 	createShortLinkFunc    func(ctx context.Context, url string, shortUrl string, linkType string, ownBy uuid.UUID) (*model.ShortLink, error)
 	updateViewCountFunc    func(ctx context.Context, id string, view int) error
+	updateShortLinkURLFunc func(ctx context.Context, id string, url string, ownBy uuid.UUID) (*model.ShortLink, error)
+	deleteShortLinkFunc    func(ctx context.Context, id string, ownBy uuid.UUID) error
 }
 
 func (m *mockShortLinkRepo) GetAllShortLink(ctx context.Context, ownBy uuid.UUID) ([]model.ShortLink, error) {
@@ -41,6 +43,20 @@ func (m *mockShortLinkRepo) CreateShortLink(ctx context.Context, url string, sho
 func (m *mockShortLinkRepo) UpdateViewCount(ctx context.Context, id string, view int) error {
 	if m.updateViewCountFunc != nil {
 		return m.updateViewCountFunc(ctx, id, view)
+	}
+	return nil
+}
+
+func (m *mockShortLinkRepo) UpdateShortLinkURL(ctx context.Context, id string, url string, ownBy uuid.UUID) (*model.ShortLink, error) {
+	if m.updateShortLinkURLFunc != nil {
+		return m.updateShortLinkURLFunc(ctx, id, url, ownBy)
+	}
+	return nil, nil
+}
+
+func (m *mockShortLinkRepo) DeleteShortLink(ctx context.Context, id string, ownBy uuid.UUID) error {
+	if m.deleteShortLinkFunc != nil {
+		return m.deleteShortLinkFunc(ctx, id, ownBy)
 	}
 	return nil
 }

@@ -1,0 +1,31 @@
+# VCS and editor metadata
+.git
+.gitignore
+.vscode
+.idea
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Build outputs and temporary files
+bin/
+dist/
+build/
+tmp/
+*.log
+
+# Dependency/cache/test artifacts
+vendor/
+coverage.out
+*.test
+
+# Docker/compose local overrides
+docker-compose.override.yml
+
+# Documentation and non-runtime assets
+API_DOCUMENTATION.md
+README.md
+skills-lock.json
+.agents/

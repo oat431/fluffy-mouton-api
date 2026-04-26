@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"errors"
+
 	"oat431/fluffy-mouton/internal/payload/request"
 	"oat431/fluffy-mouton/internal/payload/response"
 	"oat431/fluffy-mouton/internal/service"
@@ -14,8 +16,11 @@ type AuthController struct {
 	service service.AuthService
 }
 
-func NewAuthController(service service.AuthService) *AuthController {
-	return &AuthController{service: service}
+func NewAuthController(service service.AuthService) (*AuthController, error) {
+	if service == nil {
+		return nil, errors.New("auth controller: nil service")
+	}
+	return &AuthController{service: service}, nil
 }
 
 func (auth *AuthController) RegisterNewUser(c fiber.Ctx) error {
@@ -38,9 +43,9 @@ func (auth *AuthController) RegisterNewUser(c fiber.Ctx) error {
 	})
 }
 
-func (auth *AuthController) LoginIn(c fiber.Ctx) error {
+func (auth *AuthController) Login(c fiber.Ctx) error {
 	req := c.Locals("payload").(*request.LoginRequest)
-	tokenDto, err := auth.service.LoginIn(c.Context(), *req)
+	tokenDto, err := auth.service.Login(c.Context(), *req)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(common.ResponseDTO[any]{
 			Status: common.ERROR,

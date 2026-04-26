@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/jmoiron/sqlx"
@@ -24,6 +25,11 @@ func StartDatabase() *sqlx.DB {
 	if err != nil {
 		log.Fatal("cannot connect to database: ", err)
 	}
+
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(10)
+	db.SetConnMaxLifetime(5 * time.Minute)
+	db.SetConnMaxIdleTime(1 * time.Minute)
 
 	log.Info("database connected")
 

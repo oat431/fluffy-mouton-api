@@ -2,12 +2,14 @@ package repository
 
 import (
 	"context"
-	"oat431/fluffy-mouton/internal/model"
-	"oat431/fluffy-mouton/pkg/utils"
+	"errors"
+	"time"
 
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+
+	"oat431/fluffy-mouton/internal/model"
 )
 
 type ShortLinkRepository interface {
@@ -15,6 +17,8 @@ type ShortLinkRepository interface {
 	GetLinkByShortCode(ctx context.Context, code string, linkType string) (*model.ShortLink, error)
 	CreateShortLink(ctx context.Context, url string, shortUrl string, linkType string, ownBy uuid.UUID) (*model.ShortLink, error)
 	UpdateViewCount(ctx context.Context, id string, view int) error
+	UpdateShortLinkURL(ctx context.Context, id string, url string, ownBy uuid.UUID) (*model.ShortLink, error)
+	DeleteShortLink(ctx context.Context, id string, ownBy uuid.UUID) error
 }
 
 type shortLinkRepository struct {
@@ -65,16 +69,16 @@ func (s shortLinkRepository) GetLinkByShortCode(ctx context.Context, code string
 
 func (s shortLinkRepository) CreateShortLink(ctx context.Context, url string, shortUrl string, linkType string, ownBy uuid.UUID) (*model.ShortLink, error) {
 	query := "INSERT INTO tb_short_links (id,target_url, short_url, type, created_at, own_by) VALUES ($1, $2, $3,$4,$5,$6) RETURNING id, target_url, short_url, type, created_at, own_by"
-	uuid := utils.GenerateUUID()
+	id := uuid.New()
 	var sl model.ShortLink
 	err := s.db.QueryRowContext(
 		ctx,
 		query,
-		uuid,
+		id,
 		url,
 		shortUrl,
 		linkType,
-		utils.GetCurrentTime(),
+		time.Now(),
 		ownBy,
 	).Scan(&sl.ID, &sl.TargetURL, &sl.ShortURL, &sl.Type, &sl.CreatedAt, &sl.OwnBy)
 	if err != nil {
@@ -88,4 +92,30 @@ func (s shortLinkRepository) UpdateViewCount(ctx context.Context, id string, vie
 	query := "UPDATE tb_short_links SET view = $1 WHERE id = $2"
 	_, err := s.db.ExecContext(ctx, query, view, id)
 	return err
+}
+
+func (s shortLinkRepository) UpdateShortLinkURL(ctx context.Context, id string, url string, ownBy uuid.UUID) (*model.ShortLink, error) {
+	query := "UPDATE tb_short_links SET target_url = $1 WHERE id = $2 AND own_by = $3 RETURNING id, target_url, short_url, type, created_at"
+	var sl model.ShortLink
+	err := s.db.QueryRowContext(ctx, query, url, id, ownBy).Scan(&sl.ID, &sl.TargetURL, &sl.ShortURL, &sl.Type, &sl.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &sl, nil
+}
+
+func (s shortLinkRepository) DeleteShortLink(ctx context.Context, id string, ownBy uuid.UUID) error {
+	query := "DELETE FROM tb_short_links WHERE id = $1 AND own_by = $2"
+	result, err := s.db.ExecContext(ctx, query, id, ownBy)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return errors.New("short link not found")
+	}
+	return nil
 }

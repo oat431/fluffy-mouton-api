@@ -25,7 +25,7 @@ type authService struct {
 
 type AuthService interface {
 	Register(ctx context.Context, request request.RegisterRequest) (*response.AuthResponse, error)
-	LoginIn(ctx context.Context, request request.LoginRequest) (*response.JWTResponse, error)
+	Login(ctx context.Context, request request.LoginRequest) (*response.JWTResponse, error)
 	RevokeAccess(ctx context.Context, refreshToken string) error
 	GetUserDetails(ctx context.Context, authID uuid.UUID) (*response.AuthResponse, error)
 	VerifyEmail(ctx context.Context, token string) error
@@ -36,13 +36,26 @@ func NewAuthService(
 	refreshTokenRepo repository.RefreshTokenRepository,
 	emailVerifyTokenRepo repository.EmailVerifyTokenRepository,
 	emailService *SMTPService,
-) AuthService {
+) (AuthService, error) {
+	if repo == nil {
+		return nil, errors.New("auth service: nil auth repository")
+	}
+	if refreshTokenRepo == nil {
+		return nil, errors.New("auth service: nil refresh token repository")
+	}
+	if emailVerifyTokenRepo == nil {
+		return nil, errors.New("auth service: nil email verify token repository")
+	}
+	if emailService == nil {
+		return nil, errors.New("auth service: nil email service")
+	}
+
 	return &authService{
 		repo:                 repo,
 		refreshTokenRepo:     refreshTokenRepo,
 		emailVerifyTokenRepo: emailVerifyTokenRepo,
 		emailService:         emailService,
-	}
+	}, nil
 }
 
 func (s *authService) Register(ctx context.Context, request request.RegisterRequest) (*response.AuthResponse, error) {
@@ -64,9 +77,9 @@ func (s *authService) Register(ctx context.Context, request request.RegisterRequ
 
 	emailVerifyToken := model.EmailVerifyToken{
 		BaseEntity: common.BaseEntity{
-			ID:        utils.GetUUIDFromString(utils.GenerateUUID()),
-			CreatedAt: utils.GetTimeFromString(utils.GetCurrentTime()),
-			UpdatedAt: utils.GetTimeFromString(utils.GetCurrentTime()),
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		},
 		AuthID:    auth.ID,
 		Token:     tokenStr,
@@ -91,7 +104,7 @@ func (s *authService) Register(ctx context.Context, request request.RegisterRequ
 	}, nil
 }
 
-func (s *authService) LoginIn(ctx context.Context, request request.LoginRequest) (*response.JWTResponse, error) {
+func (s *authService) Login(ctx context.Context, request request.LoginRequest) (*response.JWTResponse, error) {
 	auth, err := s.repo.GetAuthByUsername(ctx, request.Username)
 	if err != nil {
 		log.Error(err.Error())
@@ -113,12 +126,11 @@ func (s *authService) LoginIn(ctx context.Context, request request.LoginRequest)
 		return nil, err
 	}
 
-	// Save refresh token
 	refreshToken := model.RefreshToken{
 		BaseEntity: common.BaseEntity{
-			ID:        utils.GetUUIDFromString(utils.GenerateUUID()),
-			CreatedAt: utils.GetTimeFromString(utils.GetCurrentTime()),
-			UpdatedAt: utils.GetTimeFromString(utils.GetCurrentTime()),
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
 		},
 		AuthID:    auth.ID,
 		Token:     refreshTokenStr,

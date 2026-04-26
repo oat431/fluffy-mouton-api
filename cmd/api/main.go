@@ -15,13 +15,16 @@ func main() {
 	db := config.StartDatabase()
 	defer db.Close()
 
-	apiContainer := bootstrap.NewAPIContainer(db)
+	apiContainer, err := bootstrap.NewAPIContainer(db)
+	if err != nil {
+		log.Fatalf("failed to initialize api container: %v", err)
+	}
 
 	app := fiber.New()
 	router.SetupRoutes(app, apiContainer)
 
 	port := os.Getenv("PORT")
-	err := app.Listen(":" + port)
+	err = app.Listen(":" + port)
 	if err != nil {
 		log.Fatal("port :" + port + " is already in use")
 	}

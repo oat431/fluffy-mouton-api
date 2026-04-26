@@ -2,14 +2,15 @@ package repository
 
 import (
 	"context"
-	"oat431/fluffy-mouton/internal/model"
-	"oat431/fluffy-mouton/internal/payload/request"
-	"oat431/fluffy-mouton/pkg/common"
-	"oat431/fluffy-mouton/pkg/utils"
+	"time"
 
 	"github.com/gofiber/fiber/v3/log"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+
+	"oat431/fluffy-mouton/internal/model"
+	"oat431/fluffy-mouton/internal/payload/request"
+	"oat431/fluffy-mouton/pkg/common"
 )
 
 type authRepository struct {
@@ -39,17 +40,17 @@ func (r *authRepository) Register(ctx context.Context, request request.RegisterR
 				"password",
 				is_verified
 			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-	id := utils.GenerateUUID()
-	currentTime := utils.GetCurrentTime()
+	id := uuid.New()
+	currentTime := time.Now()
 	_, err := r.db.ExecContext(ctx, query, id, currentTime, currentTime, nil, request.Username, request.Email, request.Password, false)
 	if err != nil {
 		return nil, err
 	}
 	return &model.Auth{
 		BaseEntity: common.BaseEntity{
-			ID:        utils.GetUUIDFromString(id),
-			CreatedAt: utils.GetTimeFromString(currentTime),
-			UpdatedAt: utils.GetTimeFromString(currentTime),
+			ID:        id,
+			CreatedAt: currentTime,
+			UpdatedAt: currentTime,
 			DeletedAt: nil,
 		},
 		Username:   request.Username,

@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "skills": {
+    "api-documentation-generator": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "computedHash": "3900be4c9f563af4b0f9450570f67db31c13307c0226c9395bc2e2fdf909b1ce"
+    },
+    "git-commit": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "98e91c1072516d99aebe9d2f4f4f56b88cfdddf110ebc79aaf1066b4e8efe8fb"
+    },
+    "go-api-design": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "e58857bba21d9f2e514eeab042273b20335716cffc7766653700c79d84c21340"
+    },
+    "go-architecture-review": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "d7f2d566362ea09fcb110af6daf480942ae9920f63a702cbaedc2dd09cf7ef28"
+    },
+    "go-code-review": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "2c4dbf02826c359d4a744ac7b1022a48af13541182c0b2689553c745e5e206c2"
+    },
+    "go-coding-standards": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "ee3f694c145966a1e42dcbaae88bd3074066ea70aa5f86d67194766b501d2d8a"
+    },
+    "go-concurrency-review": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "976668905f732c2fd51087fc37fc331f903ae6ee8285db4d695d646bb8a6dba2"
+    },
+    "go-context": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "666b565aee0ce1efa936a4410d7d934137f6036e9bd1368bc910bef31b5e4be4"
+    },
+    "go-database": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "8e7a92d7f880e133818b408f6b696b5fa71e00e01f224ecef208ea60fc59fdd6"
+    },
+    "go-dependency-audit": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "9c8eadd9ba725a791ae20219abeb672c843aef8e77ad710fdbc1ed4b7659e18f"
+    },
+    "go-design-patterns": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "174778446afa154d02fc950bfa9d6d2be07f24af06189391ca1f2fe723108505"
+    },
+    "go-error-handling": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "a5dbee474a303d5fc18564dcfeed47291610662235c1fa80fbadf8be9b1fd334"
+    },
+    "go-interface-design": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "84b69a21ff71b5aab7d89a64b0ccc390b630b9ff477e5dae041ceb69ee1d2cde"
+    },
+    "go-modernize": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "f216eba5702d96522a37bcbf187d86df319d6f20a8ba1d45b0902204b9b753e7"
+    },
+    "go-observability": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "73d3eb293191a11b891ad375802469d60bf237458678c02116eacbfe934b9e9e"
+    },
+    "go-performance-review": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "fc5b72a08cb2e39871414f324e1bcfa4500211e8de380afa011afce317de44dd"
+    },
+    "go-security-audit": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "1f7aaca037e73a73723dba4c2d802cd3f06a92489fa10030365a2e01c3c4ae40"
+    },
+    "go-test-quality": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "7fe81f2be6e12e16ad1b8aaec0ed1a18008168ddb6875080abd6971ba5519ddc"
+    },
+    "go-test-table-driven": {
+      "source": "eduardo-sl/go-agent-skills",
+      "sourceType": "github",
+      "computedHash": "a51bdca44b2e2b1c2746d1ef1368eacc58e53c1dd53876a7ee55bb7981d619fb"
+    },
+    "golang-pro": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "computedHash": "517209072b5cbeb7dfdb41f634ecff658e34e7c9e081e425d618378e9818a941"
+    }
+  }
+}

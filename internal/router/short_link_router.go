@@ -22,4 +22,10 @@ func RegisterShortLinkRoutes(router fiber.Router, controller *controller.ShortLi
 		middleware.JWTMiddleware,
 		controller.CreateCustomShortLink,
 	)
+	route.Put("/:id",
+		middleware.Validate[request.UpdateShortLinkRequest],
+		middleware.JWTMiddleware,
+		controller.UpdateShortLink,
+	)
+	route.Delete("/:id", middleware.JWTMiddleware, controller.DeleteShortLink)
 }

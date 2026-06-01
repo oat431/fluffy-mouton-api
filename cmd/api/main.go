@@ -6,6 +6,9 @@ import (
 	"oat431/fluffy-mouton/internal/config"
 	"oat431/fluffy-mouton/internal/router"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -20,12 +23,31 @@ func main() {
 		log.Fatalf("failed to initialize api container: %v", err)
 	}
 
-	app := fiber.New()
-	router.SetupRoutes(app, apiContainer)
+	app := fiber.New(fiber.Config{
+		IdleTimeout:  5 * time.Second,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	})
+	router.SetupRoutes(app, apiContainer, db)
 
-	port := os.Getenv("PORT")
-	err = app.Listen(":" + port)
-	if err != nil {
-		log.Fatal("port :" + port + " is already in use")
+	// Graceful shutdown: listen for SIGINT/SIGTERM, then drain in-flight requests
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		port := os.Getenv("PORT")
+		log.Printf("starting server on :%s", port)
+		if err := app.Listen(":" + port); err != nil {
+			log.Fatalf("server failed: %v", err)
+		}
+	}()
+
+	<-quit
+	log.Println("shutting down server gracefully...")
+
+	if err := app.ShutdownWithTimeout(30 * time.Second); err != nil {
+		log.Fatalf("forced shutdown: %v", err)
 	}
+
+	log.Println("server stopped cleanly")
 }

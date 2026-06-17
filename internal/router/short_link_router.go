@@ -9,23 +9,29 @@ import (
 )
 
 func RegisterShortLinkRoutes(router fiber.Router, controller *controller.ShortLinkController) {
-	route := router.Group("/short-link")
+	route := router.Group("/short")
 
-	route.Get("/", middleware.JWTMiddleware, controller.GetAllShortLinks)
+	route.Get("/",
+		middleware.OAuthMiddleware,
+		controller.GetAllShortLinks,
+	)
 	route.Post("/random",
 		middleware.Validate[request.ShortLinkRequest],
-		middleware.JWTMiddleware,
+		middleware.OAuthMiddleware,
 		controller.CreateRandomShortLink,
 	)
 	route.Post("/custom",
 		middleware.Validate[request.ShortLinkRequest],
-		middleware.JWTMiddleware,
+		middleware.OAuthMiddleware,
 		controller.CreateCustomShortLink,
 	)
 	route.Put("/:id",
 		middleware.Validate[request.UpdateShortLinkRequest],
-		middleware.JWTMiddleware,
+		middleware.OAuthMiddleware,
 		controller.UpdateShortLink,
 	)
-	route.Delete("/:id", middleware.JWTMiddleware, controller.DeleteShortLink)
+	route.Delete("/:id",
+		middleware.OAuthMiddleware,
+		controller.DeleteShortLink,
+	)
 }

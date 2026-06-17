@@ -4,13 +4,17 @@ services:
       context: .
       dockerfile: Dockerfile
     image: fluffy-mouton-api:latest
-    container_name: fluffy-mouton-api
+    container_name: shortlink-service
     env_file:
       - .env
     environment:
       PORT: ${PORT:-8080}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      OAUTH_ISSUER_URI: ${OAUTH_ISSUER_URI}
     ports:
       - "${PORT:-8080}:${PORT:-8080}"
     volumes:
@@ -23,9 +27,9 @@ services:
       retries: 3
       start_period: 20s
     networks:
-      - postgres-network
+      - microservices-net
 
 networks:
-  postgres-network:
+  microservices-net:
     external: true
-    name: postgres-network
+    name: microservices-net

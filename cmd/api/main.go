@@ -5,6 +5,7 @@ import (
 	"oat431/fluffy-mouton/internal/bootstrap"
 	"oat431/fluffy-mouton/internal/config"
 	"oat431/fluffy-mouton/internal/router"
+	"oat431/fluffy-mouton/pkg/utils"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,6 +16,13 @@ import (
 
 func main() {
 	config.LoadEnvConfig()
+
+	// Initialize Keycloak JWKS key set (fetches public keys on startup)
+	if err := utils.InitJWKS(); err != nil {
+		log.Printf("WARNING: Failed to initialize JWKS: %v", err)
+		log.Println("JWT validation via Authorization header will fail. Gateway header mode will still work.")
+	}
+
 	db := config.StartDatabase()
 	defer db.Close()
 

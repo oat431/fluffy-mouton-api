@@ -24,7 +24,7 @@ func NewShortLinkController(service service.ShortLinkService) (*ShortLinkControl
 }
 
 func (s *ShortLinkController) GetAllShortLinks(c fiber.Ctx) error {
-	ownBy := c.Locals("auth_id").(uuid.UUID)
+	ownBy := c.Locals("user_id").(uuid.UUID)
 	shortLinkDTOs, err := s.service.GetAllLinks(c.Context(), ownBy)
 	var res = common.ResponseDTO[[]response.ShortLinkDTO]{}
 	if err != nil {
@@ -46,7 +46,7 @@ func (s *ShortLinkController) GetAllShortLinks(c fiber.Ctx) error {
 
 func (s *ShortLinkController) CreateRandomShortLink(c fiber.Ctx) error {
 	req := c.Locals("payload").(*request.ShortLinkRequest)
-	ownBy := c.Locals("auth_id").(uuid.UUID)
+	ownBy := c.Locals("user_id").(uuid.UUID)
 
 	shortLinkDTO, err := s.service.CreateRandomShortLink(c.Context(), req.Url, ownBy)
 	var res = common.ResponseDTO[response.ShortLinkDTO]{}
@@ -69,7 +69,7 @@ func (s *ShortLinkController) CreateRandomShortLink(c fiber.Ctx) error {
 
 func (s *ShortLinkController) CreateCustomShortLink(c fiber.Ctx) error {
 	req := c.Locals("payload").(*request.ShortLinkRequest)
-	ownBy := c.Locals("auth_id").(uuid.UUID)
+	ownBy := c.Locals("user_id").(uuid.UUID)
 
 	shortLinkDTO, err := s.service.CreateCustomShortLink(c.Context(), req.Url, req.CustomName, ownBy)
 	var res = common.ResponseDTO[response.ShortLinkDTO]{}
@@ -93,7 +93,7 @@ func (s *ShortLinkController) CreateCustomShortLink(c fiber.Ctx) error {
 func (s *ShortLinkController) UpdateShortLink(c fiber.Ctx) error {
 	id := c.Params("id")
 	req := c.Locals("payload").(*request.UpdateShortLinkRequest)
-	ownBy := c.Locals("auth_id").(uuid.UUID)
+	ownBy := c.Locals("user_id").(uuid.UUID)
 
 	shortLinkDTO, err := s.service.UpdateShortLink(c.Context(), id, req.Url, ownBy)
 	var res = common.ResponseDTO[response.ShortLinkDTO]{}
@@ -116,7 +116,7 @@ func (s *ShortLinkController) UpdateShortLink(c fiber.Ctx) error {
 
 func (s *ShortLinkController) DeleteShortLink(c fiber.Ctx) error {
 	id := c.Params("id")
-	ownBy := c.Locals("auth_id").(uuid.UUID)
+	ownBy := c.Locals("user_id").(uuid.UUID)
 
 	var res = common.ResponseDTO[any]{}
 	if err := s.service.DeleteShortLink(c.Context(), id, ownBy); err != nil {
